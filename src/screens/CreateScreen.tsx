@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,6 @@ import {
 import {Create} from '../components/Create';
 import {UserList} from '../components/UserList';
 import {useService} from '../hooks/useService';
-//import DATA from '../libs/demo';
 import USER from '../libs/user';
 import moment from 'moment';
 import {
@@ -31,6 +30,7 @@ const CreateScreen = ({navigation}: Props) => {
   const {addMessage} = useService();
   const [keywordValue, setKeywordValue] = useState('');
   const [selected, setSelected] = useState([]);
+  const [contacts, setContacts] = useState(USER);
 
   const onClose = () => {
     navigation.goBack();
@@ -53,6 +53,14 @@ const CreateScreen = ({navigation}: Props) => {
       });
     }
   };
+
+  useMemo(() => {
+    if (keywordValue.length > 0) {
+      setContacts(USER.filter(e => e.name.includes(keywordValue)));
+    } else {
+      setContacts(USER);
+    }
+  }, [keywordValue]);
 
   const title = 'New Message';
 
@@ -94,7 +102,7 @@ const CreateScreen = ({navigation}: Props) => {
             contentContainerStyle={styles.container}
             style={styles.content}>
             <Create search={search} keyword={keywordValue} />
-            {USER.map((item, key) => (
+            {contacts.map((item, key) => (
               <UserList
                 key={key}
                 image={item.image}
